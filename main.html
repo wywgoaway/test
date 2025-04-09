@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Grocery Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Color System */
+            --primary: #6C63FF;
+            --primary-light: #F0EFFF;
+            --secondary: #FF6584;
+            --secondary-light: #FFEEF2;
+            --success: #48BB78;
+            --success-light: #F0FFF4;
+            --warning: #ED8936;
+            --warning-light: #FFFAF0;
+            --danger: #F56565;
+            --danger-light: #FFF5F5;
+            --info: #4299E1;
+            --info-light: #EBF8FF;
+            
+            /* Neutral Colors */
+            --white: #FFFFFF;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            
+            /* Typography */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-primary: 0 4px 15px rgba(108, 99, 255, 0.1);
+            
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-full: 9999px;
+            
+            /* Current Theme Variables */
+            --bg-color: var(--white);
+            --card-color: var(--white);
+            --text-color: var(--gray-800);
+            --text-secondary: var(--gray-500);
+            --border-color: var(--gray-200);
+            --hover-color: var(--gray-50);
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            line-height: 1.5;
+            overscroll-behavior-y: contain;
+        }
+        
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--gray-900);
+        }
+        
+        h1 { font-size: var(--text-3xl); }
+        h2 { font-size: var(--text-2xl); }
+        h3 { font-size: var(--text-xl); }
+        h4 { font-size: var(--text-lg); }
+        
+        small {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+        }
+        
+        /* Layout */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .app-header {
+            background: var(--white);
+            color: var(--gray-900);
+            padding: var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-title {
+            font-weight: 700;
+            font-size: var(--text-xl);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: var(--space-lg);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--card-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xs);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: inherit;
+            font-size: var(--text-base);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary);
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-primary);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--hover-color);
+        }
+        
+        .btn-sm {
+            padding: var(--space-sm) var(--space-md);
+            font-size: var(--text-sm);
+        }
+        
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .stat-card {
+            background: var(--card-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .stat-value {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            color: var(--primary);
+            margin: var(--space-xs) 0;
+        }
+        
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: var(--gray-100);
+            border-radius: var(--radius-full);
+            margin: var(--space-md) 0;
+            height: 8px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: var(--radius-full);
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        /* Recent Items */
+        .recent-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--space-md);
+        }
+        
+        .recent-item {
+            background: var(--card-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        
+        .recent-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .item-name {
+            font-weight: 500;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .item-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+        }
+        
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .recent-items {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-header {
+                padding: var(--space-md);
+            }
+            
+            .main-content {
+                padding: var(--space-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="header-title">Grocery Tracker</h1>
+            <div class="header-actions">
+                <button class="btn btn-icon">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="btn btn-icon">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card fade-in">
+                    <div class="stat-value">$127.50</div>
+                    <div class="stat-label">This Week</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-value">$482.30</div>
+                    <div class="stat-label">This Month</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-value">23</div>
+                    <div class="stat-label">Items Tracked</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-value">$72.70</div>
+                    <div class="stat-label">Budget Remaining</div>
+                </div>
+            </div>
+            
+            <!-- Budget Progress -->
+            <div class="card fade-in">
+                <div class="card-header">
+                    <h3>Monthly Budget</h3>
+                    <small>$72.70 remaining</small>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 73%"></div>
+                </div>
+            </div>
+            
+            <!-- Recent Items -->
+            <div class="card fade-in">
+                <div class="card-header">
+                    <h3>Recent Purchases</h3>
+                    <button class="btn btn-sm btn-outline">View All</button>
+                </div>
+                <div class="recent-items">
+                    <div class="recent-item">
+                        <div class="item-name">Organic Bananas</div>
+                        <div class="item-meta">
+                            <span>2.5 kg</span>
+                            <span>$3.75</span>
+                        </div>
+                    </div>
+                    <div class="recent-item">
+                        <div class="item-name">Free Range Eggs</div>
+                        <div class="item-meta">
+                            <span>12 pieces</span>
+                            <span>$4.20</span>
+                        </div>
+                    </div>
+                    <div class="recent-item">
+                        <div class="item-name">Whole Grain Bread</div>
+                        <div class="item-meta">
+                            <span>1 loaf</span>
+                            <span>$3.50</span>
+                        </div>
+                    </div>
+                    <div class="recent-item">
+                        <div class="item-name">Almond Milk</div>
+                        <div class="item-meta">
+                            <span>1 liter</span>
+                            <span>$2.99</span>
+                        </div>
+                    </div>
+                    <div class="recent-item">
+                        <div class="item-name">Chicken Breast</div>
+                        <div class="item-meta">
+                            <span>1.2 kg</span>
+                            <span>$12.50</span>
+                        </div>
+                    </div>
+                    <div class="recent-item">
+                        <div class="item-name">Organic Spinach</div>
+                        <div class="item-meta">
+                            <span>200g</span>
+                            <span>$3.25</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card fade-in">
+                <div class="card-header">
+                    <h3>Quick Actions</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-sm);">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-camera"></i> Scan Receipt
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-chart-pie"></i> Reports
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Simple animation on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.fade-in');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
