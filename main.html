@@ -316,6 +316,76 @@
             grid-column: 1 / -1;
         }
         
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 500px;
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--text-xl);
+            cursor: pointer;
+            color: var(--gray-500);
+        }
+        
+        .form-group {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: var(--space-sm);
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+        }
+        
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -357,10 +427,10 @@
         <header class="app-header">
             <h1 class="header-title">Grocery Tracker</h1>
             <div class="header-actions">
-                <button class="btn btn-icon">
+                <button class="btn btn-icon" id="notificationsBtn">
                     <i class="fas fa-bell"></i>
                 </button>
-                <button class="btn btn-icon">
+                <button class="btn btn-icon" id="profileBtn">
                     <i class="fas fa-user"></i>
                 </button>
             </div>
@@ -368,33 +438,18 @@
 
         <main class="main-content">
             <!-- Stats Overview -->
-            <div class="stats-grid">
-                <div class="stat-card fade-in">
-                    <div class="stat-value">$127.50</div>
-                    <div class="stat-label">This Week</div>
-                </div>
-                <div class="stat-card fade-in">
-                    <div class="stat-value">$482.30</div>
-                    <div class="stat-label">This Month</div>
-                </div>
-                <div class="stat-card fade-in">
-                    <div class="stat-value">23</div>
-                    <div class="stat-label">Items Tracked</div>
-                </div>
-                <div class="stat-card fade-in">
-                    <div class="stat-value">$72.70</div>
-                    <div class="stat-label">Budget Remaining</div>
-                </div>
+            <div class="stats-grid" id="statsContainer">
+                <!-- Filled dynamically by JavaScript -->
             </div>
             
             <!-- Budget Progress -->
             <div class="card fade-in">
                 <div class="card-header">
                     <h3>Monthly Budget</h3>
-                    <small>$72.70 remaining</small>
+                    <small id="budgetRemainingText">$500 remaining</small>
                 </div>
                 <div class="progress-container">
-                    <div class="progress-bar" style="width: 73%"></div>
+                    <div class="progress-bar" id="budgetProgressBar"></div>
                 </div>
             </div>
             
@@ -402,51 +457,10 @@
             <div class="card fade-in">
                 <div class="card-header">
                     <h3>Recent Purchases</h3>
-                    <button class="btn btn-sm btn-outline">View All</button>
+                    <button class="btn btn-sm btn-outline" id="viewAllBtn">View All</button>
                 </div>
-                <div class="recent-items">
-                    <div class="recent-item">
-                        <div class="item-name">Organic Bananas</div>
-                        <div class="item-meta">
-                            <span>2.5 kg</span>
-                            <span>$3.75</span>
-                        </div>
-                    </div>
-                    <div class="recent-item">
-                        <div class="item-name">Free Range Eggs</div>
-                        <div class="item-meta">
-                            <span>12 pieces</span>
-                            <span>$4.20</span>
-                        </div>
-                    </div>
-                    <div class="recent-item">
-                        <div class="item-name">Whole Grain Bread</div>
-                        <div class="item-meta">
-                            <span>1 loaf</span>
-                            <span>$3.50</span>
-                        </div>
-                    </div>
-                    <div class="recent-item">
-                        <div class="item-name">Almond Milk</div>
-                        <div class="item-meta">
-                            <span>1 liter</span>
-                            <span>$2.99</span>
-                        </div>
-                    </div>
-                    <div class="recent-item">
-                        <div class="item-name">Chicken Breast</div>
-                        <div class="item-meta">
-                            <span>1.2 kg</span>
-                            <span>$12.50</span>
-                        </div>
-                    </div>
-                    <div class="recent-item">
-                        <div class="item-name">Organic Spinach</div>
-                        <div class="item-meta">
-                            <span>200g</span>
-                            <span>$3.25</span>
-                        </div>
-                    </div>
+                <div class="recent-items" id="recentItemsContainer">
+                    <!-- Filled dynamically by JavaScript -->
                 </div>
             </div>
             
@@ -456,16 +470,16 @@
                     <h3>Quick Actions</h3>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-sm);">
-                    <button class="btn btn-outline">
+                    <button class="btn btn-outline" id="addItemBtn">
                         <i class="fas fa-plus"></i> Add Item
                     </button>
-                    <button class="btn btn-outline">
+                    <button class="btn btn-outline" id="scanReceiptBtn">
                         <i class="fas fa-camera"></i> Scan Receipt
                     </button>
-                    <button class="btn btn-outline">
+                    <button class="btn btn-outline" id="reportsBtn">
                         <i class="fas fa-chart-pie"></i> Reports
                     </button>
-                    <button class="btn btn-outline">
+                    <button class="btn btn-outline" id="settingsBtn">
                         <i class="fas fa-cog"></i> Settings
                     </button>
                 </div>
@@ -473,14 +487,267 @@
         </main>
     </div>
 
+    <!-- Add Item Modal -->
+    <div class="modal" id="addItemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Grocery Item</h3>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <form id="addItemForm">
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+                    <input type="text" id="itemName" placeholder="e.g. Organic Bananas" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemQuantity">Quantity</label>
+                    <input type="text" id="itemQuantity" placeholder="e.g. 2.5 kg" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemPrice">Price</label>
+                    <input type="number" id="itemPrice" placeholder="e.g. 3.75" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemCategory">Category</label>
+                    <select id="itemCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="produce">Produce</option>
+                        <option value="dairy">Dairy</option>
+                        <option value="meat">Meat</option>
+                        <option value="bakery">Bakery</option>
+                        <option value="pantry">Pantry</option>
+                        <option value="frozen">Frozen</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Item</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Simple animation on load
-        document.addEventListener('DOMContentLoaded', () => {
+        // ====== APP STATE ======
+        let groceries = JSON.parse(localStorage.getItem('groceries')) || [];
+        let monthlyBudget = 500;
+        
+        // Sample data if empty
+        if (groceries.length === 0) {
+            groceries = [
+                { id: 1, name: "Organic Bananas", quantity: "2.5 kg", price: 3.75, category: "produce", date: new Date().toISOString() },
+                { id: 2, name: "Free Range Eggs", quantity: "12 pieces", price: 4.20, category: "dairy", date: new Date(Date.now() - 86400000).toISOString() },
+                { id: 3, name: "Whole Grain Bread", quantity: "1 loaf", price: 3.50, category: "bakery", date: new Date(Date.now() - 172800000).toISOString() },
+                { id: 4, name: "Almond Milk", quantity: "1 liter", price: 2.99, category: "dairy", date: new Date(Date.now() - 259200000).toISOString() },
+                { id: 5, name: "Chicken Breast", quantity: "1.2 kg", price: 12.50, category: "meat", date: new Date(Date.now() - 345600000).toISOString() },
+                { id: 6, name: "Organic Spinach", quantity: "200g", price: 3.25, category: "produce", date: new Date(Date.now() - 432000000).toISOString() }
+            ];
+            localStorage.setItem('groceries', JSON.stringify(groceries));
+        }
+
+        // ====== DOM ELEMENTS ======
+        const elements = {
+            statsContainer: document.getElementById('statsContainer'),
+            budgetRemainingText: document.getElementById('budgetRemainingText'),
+            budgetProgressBar: document.getElementById('budgetProgressBar'),
+            recentItemsContainer: document.getElementById('recentItemsContainer'),
+            addItemModal: document.getElementById('addItemModal'),
+            addItemForm: document.getElementById('addItemForm'),
+            closeModalBtn: document.getElementById('closeModalBtn'),
+            addItemBtn: document.getElementById('addItemBtn'),
+            viewAllBtn: document.getElementById('viewAllBtn'),
+            scanReceiptBtn: document.getElementById('scanReceiptBtn'),
+            reportsBtn: document.getElementById('reportsBtn'),
+            settingsBtn: document.getElementById('settingsBtn'),
+            notificationsBtn: document.getElementById('notificationsBtn'),
+            profileBtn: document.getElementById('profileBtn')
+        };
+
+        // ====== INITIAL SETUP ======
+        function initApp() {
+            updateDashboard();
+            setupEventListeners();
+            
+            // Animate cards on load
             const cards = document.querySelectorAll('.fade-in');
             cards.forEach((card, index) => {
                 card.style.animationDelay = `${index * 0.1}s`;
             });
-        });
+        }
+
+        // ====== DASHBOARD FUNCTIONS ======
+        function updateDashboard() {
+            updateStats();
+            updateBudgetProgress();
+            updateRecentItems();
+        }
+
+        function updateStats() {
+            // Calculate weekly and monthly totals
+            const now = new Date();
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            let weeklyTotal = 0;
+            let monthlyTotal = 0;
+            let itemCount = 0;
+            
+            groceries.forEach(item => {
+                const itemDate = new Date(item.date);
+                if (itemDate >= oneWeekAgo) {
+                    weeklyTotal += item.price;
+                }
+                if (itemDate >= startOfMonth) {
+                    monthlyTotal += item.price;
+                }
+                itemCount++;
+            });
+            
+            // Update stats cards
+            elements.statsContainer.innerHTML = `
+                <div class="stat-card fade-in">
+                    <div class="stat-value">$${weeklyTotal.toFixed(2)}</div>
+                    <div class="stat-label">This Week</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-value">$${monthlyTotal.toFixed(2)}</div>
+                    <div class="stat-label">This Month</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-value">${itemCount}</div>
+                    <div class="stat-label">Items Tracked</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-value">$${(monthlyBudget - monthlyTotal).toFixed(2)}</div>
+                    <div class="stat-label">Budget Remaining</div>
+                </div>
+            `;
+        }
+
+        function updateBudgetProgress() {
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            const monthlyTotal = groceries.reduce((total, item) => {
+                const itemDate = new Date(item.date);
+                return itemDate >= startOfMonth ? total + item.price : total;
+            }, 0);
+            
+            const remaining = monthlyBudget - monthlyTotal;
+            const progressPercent = Math.min((monthlyTotal / monthlyBudget) * 100, 100);
+            
+            elements.budgetRemainingText.textContent = `$${remaining.toFixed(2)} remaining`;
+            elements.budgetProgressBar.style.width = `${progressPercent}%`;
+        }
+
+        function updateRecentItems() {
+            // Get 6 most recent items
+            const recentItems = [...groceries]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 6);
+            
+            if (recentItems.length === 0) {
+                elements.recentItemsContainer.innerHTML = `
+                    <div class="empty-state">
+                        No recent purchases. Add your first item!
+                    </div>
+                `;
+                return;
+            }
+            
+            elements.recentItemsContainer.innerHTML = recentItems.map(item => `
+                <div class="recent-item">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-meta">
+                        <span>${item.quantity}</span>
+                        <span>$${item.price.toFixed(2)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ====== MODAL FUNCTIONS ======
+        function openAddItemModal() {
+            elements.addItemModal.classList.add('active');
+        }
+
+        function closeAddItemModal() {
+            elements.addItemModal.classList.remove('active');
+            elements.addItemForm.reset();
+        }
+
+        // ====== EVENT HANDLERS ======
+        function handleAddItem(e) {
+            e.preventDefault();
+            
+            const newItem = {
+                id: Date.now(),
+                name: document.getElementById('itemName').value,
+                quantity: document.getElementById('itemQuantity').value,
+                price: parseFloat(document.getElementById('itemPrice').value),
+                category: document.getElementById('itemCategory').value,
+                date: new Date().toISOString()
+            };
+            
+            groceries.unshift(newItem);
+            localStorage.setItem('groceries', JSON.stringify(groceries));
+            
+            closeAddItemModal();
+            updateDashboard();
+            
+            // Show success feedback
+            alert(`${newItem.name} added successfully!`);
+        }
+
+        function handleScanReceipt() {
+            alert("In a real app, this would open the camera for receipt scanning");
+        }
+
+        function handleViewAll() {
+            alert("In a full app, this would show all grocery items in a separate view");
+        }
+
+        function handleReports() {
+            alert("In a full app, this would show spending reports and analytics");
+        }
+
+        function handleSettings() {
+            alert("In a full app, this would open settings");
+        }
+
+        function handleNotifications() {
+            alert("In a full app, this would show notifications");
+        }
+
+        function handleProfile() {
+            alert("In a full app, this would open user profile");
+        }
+
+        // ====== EVENT LISTENERS ======
+        function setupEventListeners() {
+            // Modal
+            elements.addItemBtn.addEventListener('click', openAddItemModal);
+            elements.closeModalBtn.addEventListener('click', closeAddItemModal);
+            elements.addItemForm.addEventListener('submit', handleAddItem);
+            
+            // Click outside modal to close
+            elements.addItemModal.addEventListener('click', (e) => {
+                if (e.target === elements.addItemModal) {
+                    closeAddItemModal();
+                }
+            });
+            
+            // Quick actions
+            elements.scanReceiptBtn.addEventListener('click', handleScanReceipt);
+            elements.viewAllBtn.addEventListener('click', handleViewAll);
+            elements.reportsBtn.addEventListener('click', handleReports);
+            elements.settingsBtn.addEventListener('click', handleSettings);
+            
+            // Header buttons
+            elements.notificationsBtn.addEventListener('click', handleNotifications);
+            elements.profileBtn.addEventListener('click', handleProfile);
+        }
+
+        // ====== INITIALIZE APP ======
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
